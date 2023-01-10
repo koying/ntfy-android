@@ -27,6 +27,7 @@ steps:
 
   - name: build
     image: nexus.semperpax.com:6000/android-build-box:latest
+    pull: if-not-exists
     commands:
       - bash ./gradlew assemblePlayRelease
       - make drone-cache
