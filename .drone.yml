@@ -28,7 +28,11 @@ steps:
   - name: build
     image: nexus.semperpax.com:6000/android-build-box:latest
     pull: if-not-exists
+    environment:
+      GOOGLE_SERVICES:
+        from_secret: google-services
     commands:
+      - echo "$GOOGLE_SERVICES" > app/google-services.json
       - bash ./gradlew assemblePlayRelease
       - make drone-cache
 
