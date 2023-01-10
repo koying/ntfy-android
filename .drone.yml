@@ -104,7 +104,7 @@ steps:
         from_secret: semperpax-keystore-password
     commands:
       - echo "${SEMPERPAX_KEYSTORE}" | base64 -d > /tmp/keystore
-      - jarsigner.exe -sigalg SHA1withRSA -digestalg SHA1 -keystore /tmp/keystore -storepass ${SEMPERPAX_KEYSTORE_PASSWORD} app/build/outputs/apk/play/release/app-play-release-unsigned.apk androiddebugkey
+      - jarsigner -sigalg SHA1withRSA -digestalg SHA1 -keystore /tmp/keystore -storepass ${SEMPERPAX_KEYSTORE_PASSWORD} app/build/outputs/apk/play/release/app-play-release-unsigned.apk androiddebugkey
       - mv app/build/outputs/apk/play/release/app-play-release-unsigned.apk app/build/outputs/apk/play/release/ntfy-play-release.apk
 
   - name: gitea_release
