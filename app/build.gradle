@@ -10,7 +10,7 @@ android {
     compileSdkVersion 33
 
     defaultConfig {
-        applicationId "io.heckel.ntfy"
+        applicationId "com.semperpax.ntfy"
         minSdkVersion 21
         targetSdkVersion 33
 
