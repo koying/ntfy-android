@@ -31,6 +31,7 @@ gen/
 
 # Ignore gradle files
 .gradle/
+gradle-build-cache/
 
 # Build outputs
 build/

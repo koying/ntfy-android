@@ -77,6 +77,7 @@ steps:
       # filesystem_cache_root: "/tmp/cache"
       mount:
         - 'gradle-build-cache'
+        - '.gradle'
     volumes:
     - name: cache
       path: /tmp/cache
@@ -89,7 +90,7 @@ steps:
         from_secret: google-services
     commands:
       - echo "$GOOGLE_SERVICES" > app/google-services.json
-      - bash ./gradlew assemblePlayRelease
+      - bash ./gradlew --build-cache assemblePlayRelease
 
   - name: gitea_release
     image: plugins/gitea-release
@@ -109,7 +110,8 @@ steps:
       archive_format: "gzip"
       # filesystem_cache_root: "/tmp/cache"
       mount:
-        - '/root/.gradle/wrapper'
+        - 'gradle-build-cache'
+        - '.gradle'
     volumes:
     - name: cache
       path: /tmp/cache
