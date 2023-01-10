@@ -100,7 +100,7 @@ steps:
       api_key:
         from_secret: gitea-apikey
       base_url: https://git.semperpax.com
-      files: app/build/outputs/apk/play/*.apk
+      files: app/build/outputs/apk/play/release/*.apk
 
   - name: rebuild-cache-with-filesystem
     image: meltwater/drone-cache
