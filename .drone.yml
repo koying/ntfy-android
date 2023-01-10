@@ -92,7 +92,20 @@ steps:
         from_secret: google-services
     commands:
       - echo "$GOOGLE_SERVICES" > app/google-services.json
-      - bash ./gradlew --build-cache assemblePlayRelease
+      - ./gradlew --build-cache assemblePlayRelease
+
+  - name: sign
+    image: nexus.semperpax.com:6000/android-build-box:latest
+    pull: if-not-exists
+    environment:
+      SEMPERPAX_KEYSTORE:
+        from_secret: semperpax-keystore
+      SEMPERPAX_KEYSTORE_PASSWORD:
+        from_secret: semperpax-keystore-password
+    commands:
+      - echo "${SEMPERPAX_KEYSTORE}" | base64 -d > /tmp/keystore
+      - jarsigner.exe -sigalg SHA1withRSA -digestalg SHA1 -keystore /tmp/keystore -storepass ${SEMPERPAX_KEYSTORE_PASSWORD} app/build/outputs/apk/play/release/app-play-release-unsigned.apk androiddebugkey
+      - mv app/build/outputs/apk/play/release/app-play-release-unsigned.apk app/build/outputs/apk/play/release/ntfy-play-release.apk
 
   - name: gitea_release
     image: plugins/gitea-release
