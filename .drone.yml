@@ -35,6 +35,62 @@ steps:
       - echo "$GOOGLE_SERVICES" > app/google-services.json
       - bash ./gradlew assemblePlayRelease
 
+  - name: rebuild-cache-with-filesystem
+    image: meltwater/drone-cache
+    pull: true
+    settings:
+      backend: "filesystem"
+      rebuild: true
+      cache_key: "android"
+      archive_format: "gzip"
+      # filesystem_cache_root: "/tmp/cache"
+      mount:
+        - '/root/.gradle/wrapper'
+    volumes:
+    - name: cache
+      path: /tmp/cache
+
+volumes:
+- name: cache
+  host:
+    path: /tmp/drone/cache
+---
+kind: pipeline
+type: docker
+name: build
+
+trigger:
+  branches:
+    - "main_mine"
+  event:
+    - tag
+
+steps:
+  - name: restore-cache-with-filesystem
+    image: meltwater/drone-cache
+    pull: true
+    settings:
+      backend: "filesystem"
+      restore: true
+      cache_key: "android"
+      archive_format: "gzip"
+      # filesystem_cache_root: "/tmp/cache"
+      mount:
+        - '/root/.gradle/wrapper'
+    volumes:
+    - name: cache
+      path: /tmp/cache
+
+  - name: build
+    image: nexus.semperpax.com:6000/android-build-box:latest
+    pull: if-not-exists
+    environment:
+      GOOGLE_SERVICES:
+        from_secret: google-services
+    commands:
+      - echo "$GOOGLE_SERVICES" > app/google-services.json
+      - bash ./gradlew assemblePlayRelease
+
   - name: gitea_release
     image: plugins/gitea-release
     settings:
