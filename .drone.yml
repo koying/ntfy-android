@@ -20,7 +20,7 @@ steps:
       archive_format: "gzip"
       # filesystem_cache_root: "/tmp/cache"
       mount:
-        - '~/.gradle/wrapper'
+        - '/root/.gradle/wrapper'
     volumes:
     - name: cache
       path: /tmp/cache
@@ -34,7 +34,14 @@ steps:
     commands:
       - echo "$GOOGLE_SERVICES" > app/google-services.json
       - bash ./gradlew assemblePlayRelease
-      - make drone-cache
+
+  - name: gitea_release
+    image: plugins/gitea-release
+    settings:
+      api_key:
+        from_secret: gitea-apikey
+      base_url: https://git.semperpax.com
+      files: app/build/outputs/apk/play/*.apk
 
   - name: rebuild-cache-with-filesystem
     image: meltwater/drone-cache
@@ -46,7 +53,7 @@ steps:
       archive_format: "gzip"
       # filesystem_cache_root: "/tmp/cache"
       mount:
-        - '~/.gradle/wrapper'
+        - '/root/.gradle/wrapper'
     volumes:
     - name: cache
       path: /tmp/cache
