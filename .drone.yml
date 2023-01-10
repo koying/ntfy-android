@@ -57,7 +57,7 @@ volumes:
 ---
 kind: pipeline
 type: docker
-name: build
+name: release
 
 trigger:
   branches:
