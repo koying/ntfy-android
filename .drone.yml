@@ -80,6 +80,18 @@ steps:
     - name: cache
       path: /tmp/cache
 
+  - name: notify
+    image: plugins/webhook
+    settings:
+      urls: https://ntfy.spax.pm
+      content_type: application/json
+      template: |
+        {
+          "topic": "drone",
+          "title": "{{ repo.name }} build - {{ build.status }}",
+          "message": "{{ build.link }}"
+        }
+
 volumes:
 - name: cache
   host:
