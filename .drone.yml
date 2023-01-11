@@ -1,70 +1,13 @@
 ---
 kind: pipeline
 type: docker
-name: build
+name: default
 
 trigger:
   branches:
     - "main_mine"
   event:
     - push
-
-steps:
-  - name: restore-cache-with-filesystem
-    image: meltwater/drone-cache
-    pull: true
-    settings:
-      backend: "filesystem"
-      restore: true
-      cache_key: "android"
-      archive_format: "gzip"
-      # filesystem_cache_root: "/tmp/cache"
-      mount:
-        - 'gradle-build-cache'
-        - '.gradle'
-    volumes:
-    - name: cache
-      path: /tmp/cache
-
-  - name: build
-    image: nexus.semperpax.com:6000/android-build-box:latest
-    pull: if-not-exists
-    environment:
-      GOOGLE_SERVICES:
-        from_secret: google-services
-    commands:
-      - echo "$GOOGLE_SERVICES" > app/google-services.json
-      - bash ./gradlew --build-cache assemblePlayRelease
-
-  - name: rebuild-cache-with-filesystem
-    image: meltwater/drone-cache
-    pull: true
-    settings:
-      backend: "filesystem"
-      rebuild: true
-      cache_key: "android"
-      archive_format: "gzip"
-      # filesystem_cache_root: "/tmp/cache"
-      mount:
-        - 'gradle-build-cache'
-        - '.gradle'
-    volumes:
-    - name: cache
-      path: /tmp/cache
-
-volumes:
-- name: cache
-  host:
-    path: /tmp/drone/cache
----
-kind: pipeline
-type: docker
-name: release
-
-trigger:
-  branches:
-    - "main_mine"
-  event:
     - tag
 
 steps:
@@ -97,6 +40,9 @@ steps:
   - name: sign
     image: nexus.semperpax.com:6000/android-build-box:latest
     pull: if-not-exists
+    when:
+      event:
+        - tag
     environment:
       SEMPERPAX_KEYSTORE:
         from_secret: semperpax-keystore
@@ -109,6 +55,9 @@ steps:
 
   - name: gitea_release
     image: plugins/gitea-release
+    when:
+      event:
+        - tag
     settings:
       api_key:
         from_secret: gitea-apikey
